@@ -10,15 +10,17 @@ const vscode = require('vscode');
  * @param {vscode.ExtensionContext} context
  */
 async function activate(context) {
-	const prettier = await import('prettier/standalone');
+	const prettier = await import('prettier');
 	const prettierPluginJava = await import('prettier-plugin-java');
 
 	const formatter = vscode.languages.registerDocumentFormattingEditProvider('java', {
 		async provideDocumentFormattingEdits(document) {
+			const prettierConfig = await prettier.resolveConfig(document.fileName, { editorconfig: true });
+
 			const formattedText = await prettier.format(document.getText(), {
 				parser: 'java',
 				plugins: [prettierPluginJava.default],
-				tabWidth: 4
+				...prettierConfig
 			});
 
 			const range = new vscode.Range(
