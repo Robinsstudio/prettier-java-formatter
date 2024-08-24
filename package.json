@@ -1,4 +1,5 @@
 {
+  "publisher": "Robinsstudio",
   "name": "prettier-java-formatter",
   "displayName": "Prettier Java formatter",
   "description": "Integration of Prettier Java into Visual Studio Code",
