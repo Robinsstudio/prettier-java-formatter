@@ -1,65 +1,23 @@
-# prettier-java-formatter README
+# Prettier Java formatter
 
-This is the README for your extension "prettier-java-formatter". After writing up a brief description, we recommend including the following sections.
+An extension to integrate Prettier Java into Visual Studio Code. It is a very small piece of code heavily inspired by [Matthew Burke](https://github.com/mwpb)'s now unmaintained [Java Prettier formatter](https://github.com/mwpb/java-prettier-formatter). It does the same thing just with different versions of [Prettier](https://github.com/prettier/prettier) and [Prettier Java](https://github.com/jhipster/prettier-java).
 
-## Features
+## Usage
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+This extension is a Java formatter. You can use it in Visual Studio Code using the "Format Document" command from the command palette (Ctrl +Shift + P or Cmd + Shift + P).
+It will only be available in open Java files as this formatter only supports Java files formatting.
 
-For example if there is an image subfolder under your extension project workspace:
+You can also set it as your default Java formatter and format the code when a file is saved.
 
-\!\[feature X\]\(images/feature-x.png\)
+## Difference with Java Prettier formatter
+As mentioned above, this package has identical functionality to [Java Prettier formatter](https://github.com/mwpb/java-prettier-formatter). It only uses different package versions. Namely Prettier 3.2.5 and Prettier Java 2.6.0. Versions are very important with respect to Prettier as it can affect the formatted code.
 
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+In order to make this extension more easily adopted, I have planned to allow custom Prettier and Prettier Java versions. This way, nobody should need to build their own extension as I did only to change package versions.
+## Acknowledgments
 
-## Requirements
+[If Java Prettier formatter only completed the last yard to use Prettier with Java files in VS Code in a standalone way](https://github.com/mwpb/java-prettier-formatter#acknowledgments), then this package only completes the last inch of doing exactly the same thing but with different package versions.
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
-
-## Extension Settings
-
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
-
-For example:
-
-This extension contributes the following settings:
-
-* `myExtension.enable`: Enable/disable this extension.
-* `myExtension.thing`: Set to `blah` to do something.
-
-## Known Issues
-
-Calling out known issues can help limit users opening duplicate issues against your extension.
-
-## Release Notes
-
-Users appreciate release notes as you update your extension.
-
-### 1.0.0
-
-Initial release of ...
-
-### 1.0.1
-
-Fixed issue #.
-
-### 1.1.0
-
-Added features X, Y, and Z.
-
----
-
-## Working with Markdown
-
-You can author your README using Visual Studio Code.  Here are some useful editor keyboard shortcuts:
-
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux)
-* Toggle preview (`Shift+Cmd+V` on macOS or `Shift+Ctrl+V` on Windows and Linux)
-* Press `Ctrl+Space` (Windows, Linux, macOS) to see a list of Markdown snippets
-
-## For more information
-
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**
+Thanks for the following work:
+- [Prettier](https://github.com/prettier/prettier) - An opinionated code formatter
+- [Prettier Java](https://github.com/jhipster/prettier-java) - Plugin to support Java files with Prettier
+- [Java Prettier formatter](https://github.com/mwpb/java-prettier-formatter) - A small Visual Studio Code extension which shamelessly inspired this one.
