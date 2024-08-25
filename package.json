@@ -13,7 +13,7 @@
   "activationEvents": [
     "onLanguage:java"
   ],
-  "main": "./dist/extension.js",
+  "main": "./extension.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/Robinsstudio/prettier-java-formatter"
@@ -34,8 +34,7 @@
   "scripts": {
     "lint": "eslint .",
     "pretest": "npm run lint",
-    "test": "vscode-test",
-    "build": "webpack"
+    "test": "vscode-test"
   },
   "devDependencies": {
     "@types/mocha": "^10.0.7",
@@ -44,9 +43,7 @@
     "@vscode/test-cli": "^0.0.9",
     "@vscode/test-electron": "^2.4.0",
     "eslint": "^8.57.0",
-    "typescript": "^5.4.5",
-    "webpack": "^5.94.0",
-    "webpack-cli": "^5.1.4"
+    "typescript": "^5.4.5"
   },
   "dependencies": {
     "prettier": "^3.2.5",
