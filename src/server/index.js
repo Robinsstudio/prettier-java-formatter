@@ -1,8 +1,8 @@
 const { buildProtocol } = require('../protocol');
 
 (async function() {
-    const prettier = await import('prettier');
-    const prettierPluginJava = await import('prettier-plugin-java');
+    const prettier = await import(process.argv[2]);
+    const prettierPluginJava = await import(process.argv[3]);
 
     async function format(fileName, code) {
 		const prettierConfig = await prettier.resolveConfig(fileName, { editorconfig: true });

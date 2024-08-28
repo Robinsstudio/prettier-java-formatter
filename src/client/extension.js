@@ -2,7 +2,7 @@
 // Import the module and reference it with the alias vscode in your code below
 
 const vscode = require('vscode');
-const { format } = require('./prettier');
+const { startPrettier } = require('./prettier');
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
@@ -11,6 +11,7 @@ const { format } = require('./prettier');
  * @param {vscode.ExtensionContext} context
  */
 async function activate(context) {
+	const format = await startPrettier();
 
 	const formatter = vscode.languages.registerDocumentFormattingEditProvider('java', {
 		async provideDocumentFormattingEdits(document) {

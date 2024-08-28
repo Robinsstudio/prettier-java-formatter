@@ -1,24 +1,73 @@
-const { spawn } = require('child_process');
+const vscode = require('vscode');
+const { spawn, exec } = require('child_process');
 const { join } = require('path');
+const { promisify } = require('util');
 const { buildProtocol } = require('../protocol');
 
-const DEBUG = false;
+const execAsync = promisify(exec);
+const configuration = vscode.workspace.getConfiguration('prettier-java-formatter');
 
-const entryPoint = join(__dirname, '..', 'server', 'index.js');
-const args = DEBUG ? ['--inspect-brk', entryPoint] : [entryPoint];
+async function startPrettier() {
+    const DEBUG = false;
 
-const process = spawn('node', args, {
-	stdio: ['inherit', 'inherit', 'inherit', 'ipc']
-});
+    const entryPoint = join(__dirname, '..', 'server', 'index.js');
+    const args = [];
 
-const protocol = buildProtocol(process).subscribe();
+    if (DEBUG) {
+        args.push('--inspect-brk');
+    }
 
-process.on('exit', () => console.log('Server exited!'));
+    args.push(entryPoint);
 
-async function format(fileName, code) {
-    const [formattedCode] = await protocol.sendFormatRequest(fileName, code);
-    return formattedCode;
+    const { stdout } = await execAsync(`${buildNodeCommand('npm')} root -g`);
+    const globalNodeModules = stdout.trim();
+
+    args.push(buildArgument({
+        globalNodeModules,
+        property: 'pathToPrettier',
+        module: 'prettier',
+        entryPoint: 'index.mjs'
+    }));
+
+    args.push(buildArgument({
+        globalNodeModules,
+        property: 'pathToPrettierJavaPlugin',
+        module: 'prettier-plugin-java',
+        entryPoint: 'dist/index.js'
+    }));
+
+    const process = spawn(buildNodeCommand('node'), args, {
+        stdio: ['inherit', 'inherit', 'inherit', 'ipc']
+    });
+
+    const protocol = buildProtocol(process).subscribe();
+
+    process.on('exit', () => console.log('Server exited!'));
+
+    return async function format(fileName, code) {
+        const [formattedCode] = await protocol.sendFormatRequest(fileName, code);
+        return formattedCode;
+    }
 }
 
+function buildNodeCommand(executable) {
+    const nodePath = configuration.get('pathToNode');
 
-module.exports = { format };
+    if (nodePath) {
+        return join(nodePath, executable);
+    }
+
+    return executable;
+}
+
+function buildArgument({ globalNodeModules, property, module, entryPoint }) {
+    const path = configuration.get(property);
+
+    if (path) {
+        return join(path, entryPoint);
+    }
+
+    return join(globalNodeModules, module, entryPoint);
+}
+
+module.exports = { startPrettier };

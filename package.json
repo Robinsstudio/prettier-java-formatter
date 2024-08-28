@@ -29,7 +29,26 @@
           "java"
         ]
       }
-    ]
+    ],
+    "configuration": {
+      "properties": {
+        "prettier-java-formatter.pathToNode": {
+          "type": ["string", "null"],
+          "default": null,
+          "description": "Absolute path to Node home, which should end with \"/bin\"."
+        },
+        "prettier-java-formatter.pathToPrettier": {
+          "type": ["string", "null"],
+          "default": null,
+          "description": "Absolute path to Prettier in node_modules, which should end with \"/node_modules/prettier\"."
+        },
+        "prettier-java-formatter.pathToPrettierJavaPlugin": {
+          "type": ["string", "null"],
+          "default": null,
+          "description": "Absolute path to plugin Prettier Java in node_modules, which should end with \"/node_modules/prettier-plugin-java\"."
+        }
+      }
+    }
   },
   "scripts": {
     "lint": "eslint .",
