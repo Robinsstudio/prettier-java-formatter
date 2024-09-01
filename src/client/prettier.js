@@ -1,4 +1,5 @@
 const vscode = require('vscode');
+const fs = require('fs');
 const { spawn, exec } = require('child_process');
 const { join } = require('path');
 const { promisify } = require('util');
@@ -22,18 +23,18 @@ async function startPrettier() {
     const { stdout } = await execAsync(`${buildNodeCommand('npm')} root -g`);
     const globalNodeModules = stdout.trim();
 
-    args.push(buildArgument({
+    args.push(await buildModulePath({
         globalNodeModules,
         property: 'pathToPrettier',
         module: 'prettier',
-        entryPoint: 'index.mjs'
+        entryPoint: 'index'
     }));
 
-    args.push(buildArgument({
+    args.push(await buildModulePath({
         globalNodeModules,
         property: 'pathToPrettierJavaPlugin',
         module: 'prettier-plugin-java',
-        entryPoint: 'dist/index.js'
+        entryPoint: join('dist', 'index')
     }));
 
     const process = spawn(buildNodeCommand('node'), args, {
@@ -50,6 +51,28 @@ async function startPrettier() {
     }
 }
 
+async function buildModulePath({ globalNodeModules, property, module, entryPoint }) {
+    const directoryPath = buildModuleDirectoryPath({ globalNodeModules, property, module });
+    const fullPath = join(directoryPath, `${entryPoint}.js`);
+
+    const exists = await fs.promises.stat(fullPath).then(() => true).catch(() => false);
+    if (exists) {
+        return fullPath;
+    }
+
+    return join(directoryPath, `${entryPoint}.cjs`);
+}
+
+function buildModuleDirectoryPath({ globalNodeModules, property, module }) {
+    const path = configuration.get(property);
+
+    if (path) {
+        return path;
+    }
+
+    return join(globalNodeModules, module);
+}
+
 function buildNodeCommand(executable) {
     const nodePath = configuration.get('pathToNode');
 
@@ -58,16 +81,6 @@ function buildNodeCommand(executable) {
     }
 
     return executable;
-}
-
-function buildArgument({ globalNodeModules, property, module, entryPoint }) {
-    const path = configuration.get(property);
-
-    if (path) {
-        return join(path, entryPoint);
-    }
-
-    return join(globalNodeModules, module, entryPoint);
 }
 
 module.exports = { startPrettier };
