@@ -4,11 +4,11 @@ const { spawn, exec } = require('child_process');
 const { join } = require('path');
 const { promisify } = require('util');
 const { buildProtocol } = require('../protocol');
+const { output } = require('./output');
 
 const execAsync = promisify(exec);
-const configuration = vscode.workspace.getConfiguration('prettier-java-formatter');
 
-async function startPrettier() {
+async function startServer() {
     const DEBUG = false;
 
     const entryPoint = join(__dirname, '..', 'server', 'index.js');
@@ -41,14 +41,23 @@ async function startPrettier() {
         stdio: ['inherit', 'inherit', 'inherit', 'ipc']
     });
 
-    const protocol = buildProtocol(process).subscribe();
+    const protocol = buildProtocol(process)
+        .onError(([, stack]) => output.appendLine(stack))
+        .subscribe();
 
-    process.on('exit', () => console.log('Server exited!'));
+    let exitCallback;
+    process.on('exit', (code, signal) => exitCallback?.(code, signal));
 
-    return async function format(fileName, code) {
-        const [formattedCode] = await protocol.sendFormatRequest(fileName, code);
-        return formattedCode;
-    }
+    return {
+        async format(fileName, code) {
+            const [formattedCode] = await protocol.sendFormatRequest(fileName, code);
+            return formattedCode;
+        },
+
+        onExit(callback) {
+            exitCallback = callback;
+        }
+    };
 }
 
 async function buildModulePath({ globalNodeModules, property, module, entryPoint }) {
@@ -64,7 +73,7 @@ async function buildModulePath({ globalNodeModules, property, module, entryPoint
 }
 
 function buildModuleDirectoryPath({ globalNodeModules, property, module }) {
-    const path = configuration.get(property);
+    const path = getConfiguration().get(property);
 
     if (path) {
         return path;
@@ -74,7 +83,7 @@ function buildModuleDirectoryPath({ globalNodeModules, property, module }) {
 }
 
 function buildNodeCommand(executable) {
-    const nodePath = configuration.get('pathToNode');
+    const nodePath = getConfiguration().get('pathToNode');
 
     if (nodePath) {
         return join(nodePath, executable);
@@ -83,4 +92,8 @@ function buildNodeCommand(executable) {
     return executable;
 }
 
-module.exports = { startPrettier };
+function getConfiguration() {
+    return vscode.workspace.getConfiguration('prettier-java-formatter');
+}
+
+module.exports = { startServer };

@@ -3,6 +3,7 @@ const { defer } = require('./defer');
 
 const FORMAT_REQUEST = 'FORMAT_REQUEST';
 const FORMAT_RESPONSE = 'FORMAT_RESPONSE';
+const ERROR = 'ERROR';
 
 function buildProtocol(process) {
     const handlersByMessageType = {};
@@ -21,6 +22,9 @@ function buildProtocol(process) {
         sendFormatResponse(id, formattedCode) {
             process.send([FORMAT_RESPONSE, id, formattedCode]);
         },
+        sendError(error) {
+            process.send([ERROR, randomUUID(), error.stack]);
+        },
         onFormatRequest(handler) {
             handlersByMessageType[FORMAT_REQUEST] = handler;
             return builder;
@@ -28,6 +32,17 @@ function buildProtocol(process) {
         onFormatResponse(handler) {
             handlersByMessageType[FORMAT_RESPONSE] = handler;
             return builder;
+        },
+        onError(handler) {
+            handlersByMessageType[ERROR] = handler;
+            return builder;
+        },
+        runAsync(callback) {
+            return callback()
+                .catch(error => {
+                    this.sendError(error);
+                    return Promise.reject(error);
+                });
         },
         subscribe() {
             process.on('message', message => {
