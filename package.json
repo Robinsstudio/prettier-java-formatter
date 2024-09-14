@@ -19,6 +19,12 @@
     "url": "https://github.com/Robinsstudio/prettier-java-formatter"
   },
   "contributes": {
+    "commands": [
+      {
+        "title": "Prettier Java formatter: Restart Prettier server",
+        "command": "prettier-java-formatter.restart"
+      }
+    ],
     "languages": [
       {
         "id": "java",

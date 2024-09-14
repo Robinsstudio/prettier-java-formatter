@@ -88,7 +88,17 @@ async function activate(context) {
 		}
 	});
 
+	const configurationListener = vscode.workspace.onDidChangeConfiguration(event => {
+		if (event.affectsConfiguration('prettier-java-formatter')) {
+			startPrettier();
+		}
+	});
+
+	const restartCommand = vscode.commands.registerCommand('prettier-java-formatter.restart', startPrettier);
+
 	context.subscriptions.push(formatter);
+	context.subscriptions.push(configurationListener);
+	context.subscriptions.push(restartCommand);
 
 	output.appendLine('Prettier Java formatter is now active!');
 }
