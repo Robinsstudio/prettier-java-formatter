@@ -8,19 +8,11 @@ const { output } = require('./output');
 let prettierInstance = null;
 
 async function startPrettier() {
+	stopPrettier();
+
 	try {
 		prettierInstance = await startServer();
-		prettierInstance.onExit((code, signal) => {
-			if (signal) {
-				output.appendLine(`Prettier server received signal ${signal}`);
-			}
-
-			if (code) {
-				output.appendLine(`Prettier server exited with code ${code}`);
-			}
-
-			displayRestartErrorMessage();
-		});
+		prettierInstance.onExit(displayRestartErrorMessage);
 	} catch (error) {
 		output.appendLine(error.stack);
 		displayRestartErrorMessage();
@@ -42,13 +34,22 @@ function displayRestartErrorMessage() {
 }
 
 async function displayErrorMessage(message, button) {
-	prettierInstance = null;
+	stopPrettier();
 
 	const clickedButton = await vscode.window.showErrorMessage(message, button);
 
 	if (clickedButton === button) {
 		return startPrettier();
 	}
+}
+
+function stopPrettier() {
+	if (prettierInstance === null) {
+		return;
+	}
+
+	prettierInstance.stopServer();
+	prettierInstance = null;
 }
 
 async function format(document) {
@@ -93,7 +94,10 @@ async function activate(context) {
 }
 
 // This method is called when your extension is deactivated
-function deactivate() { }
+function deactivate() {
+	stopPrettier();
+	output.appendLine('Prettier Java formatter is now deactivated.');
+}
 
 module.exports = {
 	activate,

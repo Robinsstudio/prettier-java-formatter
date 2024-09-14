@@ -41,17 +41,42 @@ async function startServer() {
         stdio: ['inherit', 'inherit', 'inherit', 'ipc']
     });
 
+    let exited = false;
+    let exitCallback = null;
+
     const protocol = buildProtocol(process)
         .onError(([, stack]) => output.appendLine(stack))
         .subscribe();
 
-    let exitCallback;
-    process.on('exit', (code, signal) => exitCallback?.(code, signal));
+    const exitListener = (code, signal) => exitCallback?.(code, signal);
+
+    process.on('exit', exitListener);
+
+    process.on('exit', (code, signal) => {
+		exited = true;
+
+		if (signal) {
+			output.appendLine(`Prettier server received signal ${signal}.`);
+		}
+
+		if (code) {
+			output.appendLine(`Prettier server exited with code ${code}.`);
+		}
+    });
+
+    output.appendLine('Prettier server started!');
 
     return {
         async format(fileName, code) {
             const [formattedCode] = await protocol.sendFormatRequest(fileName, code);
             return formattedCode;
+        },
+
+        stopServer() {
+            if (!exited) {
+                process.removeListener('exit', exitListener);
+                process.kill();
+            }
         },
 
         onExit(callback) {
