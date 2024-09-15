@@ -1,14 +1,25 @@
-const vscode = require('vscode');
-const fs = require('fs');
-const { spawn, exec } = require('child_process');
-const { join } = require('path');
-const { promisify } = require('util');
-const { buildProtocol } = require('../protocol');
-const { output } = require('./output');
+import vscode from 'vscode';
+import fs from 'fs';
+import { spawn, exec } from 'child_process';
+import { join } from 'path';
+import { promisify } from 'util';
+import { buildProtocol } from '../protocol';
+import { output } from './output';
+
+interface ModuleArguments {
+    globalNodeModules: string;
+    property: string;
+    module: string;
+    entryPoint: string;
+}
+
+type ExitListener = (code: number | null, signal: NodeJS.Signals | null) => void;
+
+export type PrettierInstance = Awaited<ReturnType<typeof startServer>>;
 
 const execAsync = promisify(exec);
 
-async function startServer() {
+export async function startServer() {
     const DEBUG = false;
 
     const entryPoint = join(__dirname, '..', 'server', 'index.js');
@@ -42,13 +53,13 @@ async function startServer() {
     });
 
     let exited = false;
-    let exitCallback = null;
+    let exitCallback: ExitListener | null = null;
 
     const protocol = buildProtocol(process)
         .onError(([, stack]) => output.appendLine(stack))
         .subscribe();
 
-    const exitListener = (code, signal) => exitCallback?.(code, signal);
+    const exitListener: ExitListener = (code, signal) => exitCallback?.(code, signal);
 
     process.on('exit', exitListener);
 
@@ -67,7 +78,7 @@ async function startServer() {
     output.appendLine('Prettier server started!');
 
     return {
-        async format(fileName, code) {
+        async format(fileName: string, code: string) {
             const [formattedCode] = await protocol.sendFormatRequest(fileName, code);
             return formattedCode;
         },
@@ -79,13 +90,13 @@ async function startServer() {
             }
         },
 
-        onExit(callback) {
+        onExit(callback: ExitListener) {
             exitCallback = callback;
         }
     };
 }
 
-async function buildModulePath({ globalNodeModules, property, module, entryPoint }) {
+async function buildModulePath({ globalNodeModules, property, module, entryPoint }: ModuleArguments) {
     const directoryPath = buildModuleDirectoryPath({ globalNodeModules, property, module });
     const fullPath = join(directoryPath, `${entryPoint}.js`);
 
@@ -97,8 +108,8 @@ async function buildModulePath({ globalNodeModules, property, module, entryPoint
     return join(directoryPath, `${entryPoint}.cjs`);
 }
 
-function buildModuleDirectoryPath({ globalNodeModules, property, module }) {
-    const path = getConfiguration().get(property);
+function buildModuleDirectoryPath({ globalNodeModules, property, module }: Omit<ModuleArguments, 'entryPoint'>) {
+    const path = getConfiguration().get<string>(property);
 
     if (path) {
         return path;
@@ -107,8 +118,8 @@ function buildModuleDirectoryPath({ globalNodeModules, property, module }) {
     return join(globalNodeModules, module);
 }
 
-function buildNodeCommand(executable) {
-    const nodePath = getConfiguration().get('pathToNode');
+function buildNodeCommand(executable: string) {
+    const nodePath = getConfiguration().get<string>('pathToNode');
 
     if (nodePath) {
         return join(nodePath, executable);
@@ -120,5 +131,3 @@ function buildNodeCommand(executable) {
 function getConfiguration() {
     return vscode.workspace.getConfiguration('prettier-java-formatter');
 }
-
-module.exports = { startServer };

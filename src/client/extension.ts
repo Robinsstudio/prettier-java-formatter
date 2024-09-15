@@ -1,22 +1,24 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 
-const vscode = require('vscode');
-const { startServer } = require('./prettier');
-const { output } = require('./output');
+import vscode from 'vscode';
+import { PrettierInstance, startServer } from './prettier';
+import { output } from './output';
 
-let prettierInstance = null;
+let prettierInstance: PrettierInstance | null = null;
 
-async function startPrettier() {
+function startPrettier() {
 	stopPrettier();
 
-	try {
-		prettierInstance = await startServer();
-		prettierInstance.onExit(displayRestartErrorMessage);
-	} catch (error) {
-		output.appendLine(error.stack);
-		displayRestartErrorMessage();
-	}
+	startServer()
+		.then(instance => {
+			prettierInstance = instance;
+			prettierInstance.onExit(displayRestartErrorMessage);
+		})
+		.catch((error: Error) => {
+			output.appendLine(error.stack || JSON.stringify(error, Object.getOwnPropertyNames(error)));
+			displayRestartErrorMessage();
+		});
 }
 
 function displayStartErrorMessage() {
@@ -33,7 +35,7 @@ function displayRestartErrorMessage() {
 	);
 }
 
-async function displayErrorMessage(message, button) {
+async function displayErrorMessage(message: string, button: string) {
 	stopPrettier();
 
 	const clickedButton = await vscode.window.showErrorMessage(message, button);
@@ -52,7 +54,7 @@ function stopPrettier() {
 	prettierInstance = null;
 }
 
-async function format(document) {
+async function format(document: vscode.TextDocument) {
 	if (prettierInstance === null) {
 		displayStartErrorMessage();
 		return [];
@@ -74,17 +76,16 @@ async function format(document) {
 /**
  * @param {vscode.ExtensionContext} context
  */
-async function activate(context) {
-	await startPrettier();
+async function activate(context: vscode.ExtensionContext) {
+	startPrettier();
 
 	const formatter = vscode.languages.registerDocumentFormattingEditProvider('java', {
 		async provideDocumentFormattingEdits(document) {
-			try {
-				return await format(document);
-			} catch (error) {
-				output.appendLine(error.stack);
-				return [];
-			}
+			return format(document)
+				.catch((error: Error) => {
+					output.appendLine(error.stack || JSON.stringify(error, Object.getOwnPropertyNames(error)));
+					return [];
+				});
 		}
 	});
 

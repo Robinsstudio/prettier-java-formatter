@@ -1,3 +1,5 @@
+src/**
+dist/.gitkeep
 .vscode/**
 .gitignore
 .yarnrc

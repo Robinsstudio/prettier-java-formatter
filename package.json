@@ -13,7 +13,7 @@
   "activationEvents": [
     "onLanguage:java"
   ],
-  "main": "./src/client/extension.js",
+  "main": "./dist/client/extension.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/Robinsstudio/prettier-java-formatter"
@@ -66,9 +66,12 @@
     }
   },
   "scripts": {
+    "build": "npm run clean && tsc && echo 'Extension successfully built.'",
+    "clean": "rm -r dist/* && echo 'All JavaScript files successfully deleted.' || echo 'No JavaScript files to delete.'",
     "lint": "eslint ."
   },
   "devDependencies": {
+    "@tsconfig/strictest": "^2.0.5",
     "@types/node": "20.x",
     "@types/vscode": "^1.93.0",
     "eslint": "^9.10.0",
