@@ -5,10 +5,10 @@
   "description": "Integration of Prettier Java into Visual Studio Code",
   "version": "0.0.1",
   "engines": {
-    "vscode": "^1.92.0"
+    "vscode": "^1.93.0"
   },
   "categories": [
-    "Other"
+    "Formatters"
   ],
   "activationEvents": [
     "onLanguage:java"
@@ -39,17 +39,26 @@
     "configuration": {
       "properties": {
         "prettier-java-formatter.pathToNode": {
-          "type": ["string", "null"],
+          "type": [
+            "string",
+            "null"
+          ],
           "default": null,
           "description": "Absolute path to Node home, which should end with \"/bin\"."
         },
         "prettier-java-formatter.pathToPrettier": {
-          "type": ["string", "null"],
+          "type": [
+            "string",
+            "null"
+          ],
           "default": null,
           "description": "Absolute path to Prettier in node_modules, which should end with \"/node_modules/prettier\"."
         },
         "prettier-java-formatter.pathToPrettierJavaPlugin": {
-          "type": ["string", "null"],
+          "type": [
+            "string",
+            "null"
+          ],
           "default": null,
           "description": "Absolute path to plugin Prettier Java in node_modules, which should end with \"/node_modules/prettier-plugin-java\"."
         }
@@ -57,21 +66,12 @@
     }
   },
   "scripts": {
-    "lint": "eslint .",
-    "pretest": "npm run lint",
-    "test": "vscode-test"
+    "lint": "eslint ."
   },
   "devDependencies": {
-    "@types/mocha": "^10.0.7",
     "@types/node": "20.x",
-    "@types/vscode": "^1.92.0",
-    "@vscode/test-cli": "^0.0.9",
-    "@vscode/test-electron": "^2.4.0",
-    "eslint": "^8.57.0",
-    "typescript": "^5.4.5"
-  },
-  "dependencies": {
-    "prettier": "^3.2.5",
-    "prettier-plugin-java": "^2.6.0"
+    "@types/vscode": "^1.93.0",
+    "eslint": "^9.10.0",
+    "typescript": "^5.6.2"
   }
 }
