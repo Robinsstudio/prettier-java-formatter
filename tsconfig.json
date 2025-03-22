@@ -7,10 +7,12 @@
             "ES2022"
         ],
         "outDir": "dist",
+        "rootDir": "src",
         "sourceMap": true
     },
     "exclude": [
         "dist",
-        "node_modules"
+        "node_modules",
+        "eslint.config.mjs"
     ]
 }

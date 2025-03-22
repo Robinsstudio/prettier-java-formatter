@@ -6,5 +6,5 @@ dist/.gitkeep
 vsc-extension-quickstart.md
 **/jsconfig.json
 **/*.map
-**/.eslintrc.json
+**/eslint.config.mjs
 **/node_modules/**
