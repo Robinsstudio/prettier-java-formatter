@@ -3,7 +3,7 @@ import { Args, buildProtocol } from '../protocol';
 (async function() {
 	const protocol = buildProtocol(process)
 		.onFormatRequest(async ([id, fileName, code]) =>
-			protocol.sendFormatResponse(id, await protocol.runAsync(() => format(fileName, code)))
+			protocol.sendFormatResponse(id, await protocol.runAsync(() => tryToFormat(fileName, code)))
 		)
 		.subscribe();
 
@@ -23,6 +23,17 @@ import { Args, buildProtocol } from '../protocol';
 
 	const { default: prettier } = await protocol.runAsync(() => import(argv[2]));
 	const { default: prettierPluginJava } = await protocol.runAsync(() => import(argv[3]));
+
+	async function tryToFormat(fileName: string, code: string): Promise<string> {
+		return format(fileName, code).catch((error: Error) => {
+			if (error.message.startsWith('Sad sad panda')) {
+				protocol.sendError(error);
+				return code;
+			}
+
+			throw error;
+		});
+	}
 
 	async function format(fileName: string, code: string): Promise<string> {
 		const prettierConfig = await prettier.resolveConfig(fileName, { editorconfig: true });
