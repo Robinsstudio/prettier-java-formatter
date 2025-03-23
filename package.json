@@ -3,7 +3,7 @@
   "name": "prettier-java-formatter",
   "displayName": "Prettier Java formatter",
   "description": "Integration of Prettier Java into Visual Studio Code",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "icon": "icon.png",
   "engines": {
     "vscode": "^1.93.0"
