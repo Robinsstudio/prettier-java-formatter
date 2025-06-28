@@ -49,7 +49,8 @@ export async function startServer() {
 	}));
 
 	const process = spawn(buildNodeCommand('node'), args, {
-		stdio: ['inherit', 'inherit', 'inherit', 'ipc']
+		stdio: ['inherit', 'inherit', 'inherit', 'ipc'],
+		windowsHide: true
 	});
 
 	let exited = false;
@@ -101,11 +102,13 @@ async function buildModulePath({ globalNodeModules, property, module, entryPoint
 	const fullPath = join(directoryPath, `${entryPoint}.js`);
 
 	const exists = await fs.promises.stat(fullPath).then(() => true).catch(() => false);
+	const prefix = process.platform === 'win32' ? 'file:///' : '';
+
 	if (exists) {
-		return fullPath;
+		return prefix + fullPath;
 	}
 
-	return join(directoryPath, `${entryPoint}.cjs`);
+	return prefix + join(directoryPath, `${entryPoint}.cjs`);
 }
 
 function buildModuleDirectoryPath({ globalNodeModules, property, module }: Omit<ModuleArguments, 'entryPoint'>) {
