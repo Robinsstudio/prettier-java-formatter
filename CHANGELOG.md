@@ -1,9 +1,13 @@
-# Change Log
+# Changelog
 
-All notable changes to the "prettier-java-formatter" extension will be documented in this file.
+## [1.1.0] - 2025-09-13
 
-Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
+### Added
 
-## [Unreleased]
+- Support for Windows systems
 
-- Initial release
+## [1.0.0] - Initial Release
+
+### Added
+
+- Integration of Prettier Java within Visual Studio Code for macOS and Linux

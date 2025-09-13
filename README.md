@@ -14,11 +14,11 @@ This extension allows you to format your Java files using Prettier's Java plugin
 
 ## 🖥️ Platform Support
 
-| Platform | Status | Notes |
-|----------|--------|-------|
-|macOS|✅ Supported|Fully tested and functional
-|Linux|⚠️ Expected|Support expected but not confirmed yet|
-|Windows|🚫 Not yet supported|Planned for future release|
+| Platform | Status |
+|----------|--------|
+|macOS|✅|
+|Linux|✅|
+|Windows|✅|
 
 ## 📦 Installation
 ### 📍 From the Marketplace (Recommended)
